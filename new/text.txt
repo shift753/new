@@ -1,0 +1,492 @@
+For most questions use these commands in terminal
+cd reactapp
+npm install
+npm install canvas
+and run test case
+1. Greeting Message
+//App.js
+import React from 'react';
+import './assets/css/App.css';
+import Greeting from './components/Greeting';
+function App() {
+return (
+<div className="App">
+<Greeting/>
+</div>
+);
+}
+export default App;
+// Greeting.js
+import React from 'react';
+const Greeting = () => {
+const userName = 'John';
+const formattedDate = new Date().toLocaleDateString('en-US', {
+weekday: 'long',
+year: 'numeric',
+month: 'long',
+day: 'numeric'
+});
+return (
+<div>
+<h1>Hello, {userName}!</h1>
+<p>Welcome to our website. Today is {formattedDate}.</p>
+</div>
+);
+};
+export default Greeting;
+3. Display data using Props
+// App.js
+import React from 'react';
+const App = () => {
+const dynamicData = new Date().toString();
+return (
+<div>
+<p>Static Data:</p>
+<span>Hello, I am static data!</span>
+<p>Dynamic Data:</p>
+<span>{dynamicData}</span>
+</div>
+);
+};
+export default App;
+4. TodoList.jsx
+CREATE EMPTY TodoItem.jsx
+// TodoList.js
+import React, { useState } from 'react';
+import TodoItem from './TodoItem';
+const TodoList = () => {
+const [todos, setTodos] = useState([]);
+const [newTodo, setNewTodo] = useState('');
+const addTodo = () => {
+if (newTodo.trim()) {
+setTodos([...todos, newTodo]);
+setNewTodo('');
+}
+};
+const deleteTodo = (index) => {
+setTodos(todos.filter((_, i) => i !== index));
+};
+return (
+<div>
+<h1>Todo List</h1>
+<input
+type="text"
+placeholder="Add a new todo"
+value={newTodo}
+onChange={(e) => setNewTodo(e.target.value)}
+/>
+<button onClick={addTodo}>Add</button>
+<div>
+{todos.map((todo, index) => (
+<TodoItem
+key={index}
+text={todo}
+onDelete={() => deleteTodo(index)}
+/>
+))}
+</div>
+</div>
+);
+};
+export default TodoList;
+//App.js
+import React from 'react';
+import TodoList from './components/TodoList';
+function App() {
+return (
+<div className="App">
+<TodoList/>
+</div>
+);
+}
+export default App;
+5.Card Component with Material-UI
+// src/components/CustomCard.jsx
+import React from 'react';
+import { Card, CardActions, CardContent, CardMedia, Button, Typography } from '@mui/material';
+import treeImage from '../assets/images/tree.jpg'; // Assuming the tree.jpg image is in src/assets/images/
+const CustomCard = () => {
+const handleShareClick = () => {
+console.log('Share button clicked');
+};
+const handleLearnMoreClick = () => {
+console.log('Learn More button clicked');
+};
+return (
+<Card sx={{ maxWidth: 345 }}>
+<CardMedia
+component="img"
+height="140"
+image={treeImage}
+alt="Tree"
+/>
+<CardContent>
+<Typography gutterBottom variant="h5" component="div">
+Nature
+</Typography>
+<Typography variant="body2" color="text.secondary">
+In the embrace of nature, the symphony of chirping birds and the gentle caress of a breeze paint a serene canvas of tranquility.
+</Typography>
+</CardContent>
+<CardActions>
+<Button size="small" onClick={handleShareClick}>Share</Button>
+<Button size="small" onClick={handleLearnMoreClick}>Learn More</Button>
+</CardActions>
+</Card>
+);
+};
+export default CustomCard;
+// src/App.js
+import React from 'react';
+import CustomCard from './components/CustomCard';
+function App() {
+return (
+<div className="App">
+<CustomCard />
+</div>
+);
+}
+export default App;
+6.Error Boundary
+//ErrorBoundary.jsx
+import React, { Component }
+from 'react';
+import PropTypes from 'prop-types';
+class ErrorBoundary extends Component {
+constructor(props) {
+super(props);
+this.state = { hasError: false };
+}
+static getDerivedStateFromError() {
+return { hasError: true };
+}
+componentDidCatch(error, info) {
+console.error('ErrorBoundary caught an error:', error, info);
+}
+render() {
+if (this.state.hasError) {
+return <h2>Something went wrong</h2>;
+}
+return this.props.children;
+}
+}
+ErrorBoundary.propTypes = {
+children: PropTypes.node.isRequired,
+};
+export default ErrorBoundary;
+//Hero.jsx
+import React from 'react';
+import PropTypes from 'prop-types';
+const Hero = ({ heroName }) => {
+if (heroName === 'Joker') {
+throw new Error('Not a hero');
+}
+return <div>{heroName}</div>;
+};
+Hero.propTypes = {
+heroName: PropTypes.string.isRequired,
+};
+export default Hero;
+import React from 'react';
+import Hero from './components/Hero';
+import ErrorBoundary from './components/ErrorBoundary';
+const App = () => {
+return (
+<div className="App">
+<ErrorBoundary>
+<Hero heroName="Batman" />
+</ErrorBoundary>
+<ErrorBoundary>
+<Hero heroName="Joker" />
+</ErrorBoundary>
+</div>
+);
+};
+export default App;
+7.Login Form using useRef
+import React, { useState } from 'react';
+const LoginForm = () => {
+const [email, setEmail] = useState('');
+const [password, setPassword] = useState('');
+const handleSubmit = (e) => {
+e.preventDefault();
+console.log({ email, password });
+// Reset form values
+setEmail('');
+setPassword('');
+// Focus on the email input after form submission
+document.getElementById('email').focus();
+};
+return (
+<form data-testid="login-form" onSubmit={handleSubmit}>
+<label htmlFor="email">Email:</label>
+<input
+id="email"
+type="email"
+value={email}
+onChange={(e) => setEmail(e.target.value)}
+required
+/>
+<label htmlFor="password">Password:</label>
+<input
+id="password"
+type="password"
+value={password}
+onChange={(e) => setPassword(e.target.value)}
+required
+/>
+<button type="submit">Login</button>
+</form>
+);
+};
+export default LoginForm;
+8. Higher Order Component
+//WithLoading.jsx
+import React, { Component } from 'react';
+const WithLoading = (WrappedComponent) => {
+return class extends Component {
+constructor(props) {
+super(props);
+this.state = {
+isLoading: true,
+};
+}
+componentDidMount() {
+setTimeout(() => {
+this.setState({ isLoading: false });
+}, 2000); // Simulate a loading delay
+}
+render() {
+const { isLoading } = this.state;
+return isLoading ? (
+<div>Loading...</div>
+) : (
+<WrappedComponent {...this.props} />
+);
+}
+};
+};
+export default WithLoading;
+//MyComponent.jsx
+import React from 'react';
+const MyComponent = () => {
+return <h1>Hello, I'm the wrapped component!</h1>;
+};
+export default MyComponent;
+//App.js
+import React from 'react';
+import MyComponent from './components/MyComponent';
+import WithLoading from './components/WithLoading';
+const WrappedComponentWithLoading = WithLoading(MyComponent);
+function App() {
+return (
+<div>
+<h1>App with Higher-Order Component</h1>
+<WrappedComponentWithLoading />
+</div>
+);
+}
+export default App;
+9. User List Component With Material-UI Integration and API Fetching
+//axios.js
+const myModule = {
+get: jest.fn(() =>
+Promise.resolve({
+data: [
+{
+id: 1,
+name: "John Doe",
+email: "john@gmail.com"
+},
+{
+id: 2,
+name: "Michael",
+email: "michael@gmail.com"
+},
+{
+id: 3,
+name: "Daemon",
+email: "daemon@gmail.com"
+},
+{
+id: 4,
+name: "Klaus",
+email: "klaus@gmail.com"
+},
+{
+id: 5,
+name: "Mikey",
+email: "mikey@gmail.com"
+}
+]
+})
+)
+};
+export default myModule;
+//App.js
+import React from 'react';
+import UserList from './components/UserList';
+const App = () => {
+return (
+<div>
+<h1>User Management</h1>
+<UserList />
+</div>
+);
+};
+export default App;
+//UserList.jsx
+import React, { useEffect, useState } from 'react';
+import { Avatar, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
+import { getAllUsers } from '../services/UserApi';
+const UserList = () => {
+const [userList, setUserList] = useState([]);
+useEffect(() => {
+const fetchData = async () => {
+try {
+const response = await getAllUsers();
+setUserList(response.data);
+} catch (error) {
+console.error('Error fetching user data', error);
+}
+};
+fetchData();
+}, []);
+return (
+<div>
+<Typography variant="h5" gutterBottom>
+User List
+</Typography>
+<List>
+{userList.length === 0 ? (
+<Typography>No users found</Typography>
+) : (
+userList.map(user => (
+<ListItem key={user.id}>
+<ListItemAvatar>
+<Avatar>{user.name[0]}</Avatar>
+</ListItemAvatar>
+<ListItemText primary={user.name} secondary={user.email} />
+</ListItem>
+))
+)}
+</List>
+</div>
+);
+};
+export default UserList;
+//UserApi.js
+import axios from 'axios';
+export const getAllUsers = async () => {
+const response = await axios.get('http://localhost:3005/users');
+return response;
+};
+TERMINAL COMMANDS
+In one terminal
+cd reactapp
+npm install
+npm install json-server@0.16.3
+npm install canvas
+Another server for db.json
+cd reactapp
+npx json-server --watch db.json -p 3005
+10.Counter using Redux
+//App.js
+import React from 'react';
+import { Provider } from 'react-redux';
+import { Store } from './redux/Store';
+import Counter from './components/Counter';
+const App = () => (
+<Provider store={Store}>
+<Counter />
+</Provider>
+);
+export default App;
+//components/Counter.jsx
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { increment, decrement } from '../redux/CounterAction';
+const Counter = () => {
+const count = useSelector((state) => state.count);
+const dispatch = useDispatch();
+return (
+<div>
+<p>Count: {count}</p>
+<button onClick={() => dispatch(increment())}>Increment</button>
+<button onClick={() => dispatch(decrement())}>Decrement</button>
+</div>
+);
+};
+export default Counter;
+//redux/Store.js
+import { createStore } from 'redux';
+import counterReducer from './CounterReducer';
+export const Store = createStore(counterReducer);
+//reduxCounterReducer.js
+const initialState = { count: 0 };
+const counterReducer = (state = initialState, action) => {
+switch (action.type) {
+case 'INCREMENT':
+return { count: state.count + 1 };
+case 'DECREMENT':
+return { count: state.count - 1 };
+default:
+return state;
+}
+};
+export default counterReducer;
+//redux/CounterAction.js
+export const increment = () => ({ type: 'INCREMENT' });
+export const decrement = () => ({ type: 'DECREMENT' });
+11.Theme App using Redux
+// App.js
+import React from 'react';
+import { Provider } from 'react-redux';
+import Theme from './components/Theme';
+import { Store } from './redux/Store';
+const App = () => {
+return (
+<Provider store={Store}>
+<Theme />
+</Provider>
+);
+};
+export default App;
+// Store.js
+import { configureStore } from '@reduxjs/toolkit';
+import themeReducer from './themeSlice';
+export const Store = configureStore({
+reducer: {
+theme: themeReducer,
+},
+});
+// themeSlice.js
+import { createSlice } from '@reduxjs/toolkit';
+const themeSlice = createSlice({
+name: 'theme',
+initialState: { isDark: true },
+reducers: {
+toggleTheme: (state) => {
+state.isDark = !state.isDark;
+},
+},
+});
+export const { toggleTheme } = themeSlice.actions;
+export default themeSlice.reducer;
+// Theme.js
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleTheme } from '../redux/themeSlice';
+const Theme = () => {
+const dispatch = useDispatch();
+const isDark = useSelector((state) => state.theme.isDark);
+return (
+<div
+data-testid="theme-container"
+style={{ backgroundColor: isDark ? 'black' : 'white', color: isDark ? 'white' : 'black' }}
+>
+<button onClick={() => dispatch(toggleTheme())}>Theme</button>
+</div>
+);
+};
+export default Theme;
